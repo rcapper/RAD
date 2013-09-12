@@ -21,7 +21,12 @@ There are several schools of thought about trimming strategies.  Of course, you 
 	can be an issue.  And homopolymers can occur, but they don't like to map well anyway, so generally 
 	not an issue."
 	
-	
+Anyway, I used a script written by M. Matz (April 2013) to remove Illumina adaptors and require the restriction site for each read.  The output was then funneled into the fastxtoolkit to filter for low-qual reads:
+
+```
+module load fastx_toolkit
+trim2bRAD.pl K208.fastq '.{12}CGA.{6}TGC.{12}|.{12}GCA.{6}TCG.{12}' 'AGATCGGAAGA' 0 | fastq_quality_filter -Q33 -q 20 -p 90 > K208.trim
+```
 	
 
 
