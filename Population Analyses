@@ -1,0 +1,23 @@
+### Population Analysis via TypeII-B RAD SNPs
+---
+Previously, we worked up from raw reads through GATK's UnifiedGenotyper and ended up with a filtered vcf for all six populations.  Now, we will use those SNPs to:
+    1) determine distribution of population genetic parameters among and between those populations, 
+    2) identify molecular signatures of selection and other evolutionary forces on the genome in hopes of finding genes that may be relevant for local adaptation, 
+    3) analyze the history of those populations such as evolutionary rates between pops and across the genome and topology of the pops using a subset of markers and coalescence theory, and 
+    4) connectivity among the populations.
+
+Here, we will first 
+    1.  calculate the population genetic statistics:
+      * Fst: Model-based (BayeScan) AND model-free (vcftools first-pass, vcftools + permutation + bootstrapping)
+      * LD
+      * Tajima's D
+      * pi
+      * S
+      * rho
+    2.  then identify significance (not trivial): BayeScan calculates significance/FDR rates automatically; vcftools should be permuted/bootstrapped to generate a null distribution to which to compare to the values such that a p-value can be calculated.  I'm not sure how to do the latter yet.
+    3.  search for patterns or trends: Should we identify Fst outliers alone, or outliers for other stats, or combinations/patterns of different stats, or trends and patterns alone?
+    4.  and annotate those 'outlier' regions.  
+    
+    5.  Then, run STRUCTURE, MIGRATE, BEAST etc.
+
+## Fst
