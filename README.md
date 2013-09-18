@@ -39,6 +39,11 @@ When I then used GATK's hard-clipping tool on the sorted.bam file to delete the 
 ---
 
 
+## Population Statistics:
+---
+
+To filter by Minor Allele Frequency or not?  See: http://csb.scichina.com:8080/kxtbe/EN/abstract/abstract413250.shtml, "Effects of cutoff thresholds for minor allele frequencies on HapMap resolution: A real dataset-based evaluation of the Chinese Han and Tibetan populations"
+
 
 
 
