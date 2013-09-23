@@ -67,12 +67,12 @@ Try to use as many SNPs as possible.  To filter for MAF or not?  Maybe not such 
 
 But, do filter out the outlier loci as identified by BayeScan.  
 
-1)  Convert vcf into genepop  (vcf2genepop.pl)
-2)  Delete loci that are implicated as outliers by BayeScan (remember, we did BayeScan several times: once per pairwise comparison, once for the five pops and once for all six pops, so consider/remove all outlying loci) (script = remove_loci_from_genepop.pl)
+1.  Convert vcf into genepop  (vcf2genepop.pl)
+2.  Delete loci that are implicated as outliers by BayeScan (remember, we did BayeScan several times: once per pairwise comparison, once for the five pops and once for all six pops, so consider/remove all outlying loci) (script = remove_loci_from_genepop.pl)
 	** alternatively, split this genepop into smaller pieces of random SNPs via script splitgenepop.pl
-3)  convert .genepop into .structure
-4)  make mainparams, extraparams files
-5)  run STRUCTURE
+3.  convert .genepop into .structure
+4.  make mainparams, extraparams files
+5.  run STRUCTURE
 
 
 
