@@ -57,6 +57,8 @@ See Association Mapping of Kernel Size and Milling Quality in Wheat (Triticum ae
 
 Basically, you can either draw an arbitrary cutoff value at r^2 = 0.1, or you can mark the 95th percentile of the distribution of unlinked loci and intersect that line with the loess regression.
 
+Also see : http://fabiomarroni.wordpress.com/2011/08/09/estimate-decay-of-linkage-disequilibrium-with-distance/
+
 
 ### Population Connectivity:
 ---
@@ -65,10 +67,13 @@ Try to use as many SNPs as possible.  To filter for MAF or not?  Maybe not such 
 
 But, do filter out the outlier loci as identified by BayeScan.  
 
-1)  Convert vcf into genepop 
+1)  Convert vcf into genepop  (vcf2genepop.pl)
+2)  Delete loci that are implicated as outliers by BayeScan (remember, we did BayeScan several times: once per pairwise comparison, once for the five pops and once for all six pops, so consider/remove all outlying loci) (script = remove_loci_from_genepop.pl)
+2.1)  alternatively, split this genepop into smaller pieces of random SNPs via script splitgenepop.pl
+3)  convert .genepop into .structure
+4)  make mainparams, extraparams files
+5)  run STRUCTURE
 
-
-Also see : http://fabiomarroni.wordpress.com/2011/08/09/estimate-decay-of-linkage-disequilibrium-with-distance/
 
 
 
