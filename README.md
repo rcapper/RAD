@@ -72,15 +72,26 @@ But, do filter out the outlier loci as identified by BayeScan.
 3.  Split the genepop into random pieces (note: *SNPs are randomly selected, no attention paid to LD*): `genepop_split.pl six_pops.neutral.genepop (number of chunks) r`
 4.  convert .genepop into .structure: `java -jar /work/01408/rlc2489/RoxyTools/PGDSpider_2.0.4.0/PGDSpider2-cli.jar \` `-inputfile five_pops.neutral.genepop -inputformat GENEPOP \` `-outputfile five_pops.neutral.structure -outputformat STRUCTURE \ -spid genepop2structure.spid`
 5.  make mainparams, extraparams files using the desktop version of STRUCTURE
-6.  run STRUCTURE
-	**Time for running STRUCTURE, k=2
-		30k SNPs:  1000 runs/2hrs = 1M runs/83days
-		10k SNPs:  3000 runs/6mins = 30,000 runs/hr = 1M runs/33hrs
-		 5k SNPs:
-		 1k SNPs:
-	       0.5k SNPs:
+6.  run STRUCTURE:  Note, here, try running to 500,000 runs (50,000 burn-in) and check for convergence.  1M runs will likely not finish within 24hrs.
 
-		Split it into smaller pieces: , try 10k SNPs/structure run
+	**Time for running five_pops STRUCTURE, k=2
+		30k SNPs: | 1000 runs/2hrs | 1M runs/83days |
+		10k SNPs: | 3000 runs/6mins | 30,000 runs/hr | 1M runs/33hrs |
+		 5k SNPs: | 4500 runs/5mins | 54,000 runs/hr | 1M runs/18.5hrs |
+		 1k SNPs: |
+	       0.5k SNPs: |
+		
+	**Time for running five_pops STRUCTURE, 5k SNPs, various k's
+		k=2: | 13,000 runs/14 mins | 55,714 runs/hr | 1M runs/17.9hrs
+		k=3: |  5,000 runs/7mins | 42,857 runs/hr | 1M runs/23.3hrs
+		k=4: |  4,800 runs/7mins | 41,143 runs/hr | 1M runs/24.3hrs
+		k=5: |  5,600 runs/10mins | 33,600 runs/hr | 1M runs/29.7hrs
+		
+	**Time for running six_pops STRUCTURE, 5k SNPs, various k's
+		k=2: |
+		k=3: |
+		k=4: | 
+		k=5: |
 
 
 
