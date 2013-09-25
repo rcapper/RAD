@@ -74,8 +74,11 @@ But, do filter out the outlier loci as identified by BayeScan.
 5.  make mainparams, extraparams files using the desktop version of STRUCTURE
 6.  run STRUCTURE:  Note, here, try running to 500,000 runs (50,000 burn-in) and check for convergence.  1M runs will likely not finish within 24hrs.
 
-	**Time for running five_pops STRUCTURE, k=2
-		
+
+#### STRUCTURE Stats:
+---
+
+###### Time for running five_pops STRUCTURE, k=2
 number of SNPs | raw | per hr | per 1M |
 | ------------ | ------------- | ------ | ---- |
 30k SNPs: | 1000 runs/2hrs | 1M runs/83days |
@@ -84,7 +87,7 @@ number of SNPs | raw | per hr | per 1M |
 1k SNPs: |
 0.5k SNPs: |
 		
-	**Time for running five_pops STRUCTURE, 5k SNPs, various k's
+##### Time for running five_pops STRUCTURE, 5k SNPs, various k's
 k=2: | 13,000 runs/14 mins | 55,714 runs/hr | 1M runs/17.9hrs
 k=3: |  5,000 runs/7mins | 42,857 runs/hr | 1M runs/23.3hrs
 k=4: |  4,800 runs/7mins | 41,143 runs/hr | 1M runs/24.3hrs
