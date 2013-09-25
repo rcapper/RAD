@@ -69,10 +69,18 @@ But, do filter out the outlier loci as identified by BayeScan.
 
 1.  Convert vcf into genepop  (vcf2genepop.pl)
 2.  Delete loci that are implicated as outliers by BayeScan (remember, we did BayeScan several times: once per pairwise comparison, once for the five pops and once for all six pops, so consider/remove all outlying loci) (script = remove_loci_from_genepop.pl)
-	** alternatively, split this genepop into smaller pieces of random SNPs via script splitgenepop.pl
-3.  convert .genepop into .structure: java -jar PGDSpider2-cli.jar -inputfile five_pops.neutral.genepop -nputformat GENEPOP -outputfile five_pops.neutral.structure -outputformat STRUCTURE -spid genepop2structure.spid
+3.  Split the genepop into random pieces (note: *SNPs are randomly selected, no attention paid to LD*): "genepop_split.pl six_pops.neutral.genepop (number of chunks) r"
+3.  convert .genepop into .structure: java -jar /work/01408/rlc2489/RoxyTools/PGDSpider_2.0.4.0/PGDSpider2-cli.jar -inputfile five_pops.neutral.genepop -inputformat GENEPOP -outputfile five_pops.neutral.structure -outputformat STRUCTURE -spid genepop2structure.spid
 4.  make mainparams, extraparams files
 5.  run STRUCTURE
+	**Time for running STRUCTURE, k=2
+		30k SNPs:  1000 runs/2hrs = 1M runs/83days
+		10k SNPs:  3000 runs/6mins = 30,000 runs/hr = 1M runs/33hrs
+		 5k SNPs:
+		 1k SNPs:
+	       0.5k SNPs:
+
+		Split it into smaller pieces: , try 10k SNPs/structure run
 
 
 
