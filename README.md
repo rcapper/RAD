@@ -84,7 +84,7 @@ number of SNPs | raw rate | per hr | per 1M |
 30k SNPs: | 1000 runs/2hrs | 500 runs/hr | 1M runs/83days |
 10k SNPs: | 3000 runs/6mins | 30,000 runs/hr | 1M runs/33hrs |
 5k SNPs: | 4500 runs/5mins | 54,000 runs/hr | 1M runs/18.5hrs |
-1k SNPs: |  |  |  |
+1k SNPs: | 28400 runs/6mins |  284,000 runs/hr | 1M runs/3.5hrs  |
 0.5k SNPs: |
 0.1k SNPs: |
 		
