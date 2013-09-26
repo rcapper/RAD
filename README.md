@@ -85,8 +85,8 @@ number of SNPs | raw rate | per hr | per 1M |
 10k SNPs: | 3000 runs/6mins | 30,000 runs/hr | 1M runs/33hrs |
 5k SNPs: | 4500 runs/5mins | 54,000 runs/hr | 1M runs/18.5hrs |
 1k SNPs: | 28400 runs/6mins |  284,000 runs/hr | 1M runs/3.5hrs  |
-0.5k SNPs: |
-0.1k SNPs: |
+0.5k SNPs: | 140,200 runs/15mins | 560,800 runs/hr | 1M runs/1.8hrs |
+0.1k SNPs: | 218,000 runs/5mins | 2,616,000 runs/hr | 1M runs/0.4hrs |
 		
 ##### Time for running FIVE_pops STRUCTURE, 5k SNPs, various k's
 | K | raw rate | per hr | per 1M |
