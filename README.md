@@ -56,7 +56,7 @@ Preparing data:
 ####
 
 -- Pairwise comparisons, or all populations considered together?
-Do you consider loci that are outliers when comparing two pops pairwise, or do you apply BayeScan to all five or six or twenty pops together?  For example, if you have southern, northern, eastern and western pops, do you compare S-N, S-W, S-E, N-W, N-E and E-W, or S-N-E-W at once?  Do you lose power for having multiple comparisons?  Must you correct for those?  Are true signatures of local adaptaion unique to the southern population lost when you compare S-N-E-W instead of S-N?
+Do you consider loci that are outliers when comparing two pops pairwise, or do you apply BayeScan to all five or six or twenty pops together?  For example, if you have southern, northern, eastern and western pops, do you compare S-N, S-W, S-E, N-W, N-E and E-W, or S-N-E-W at once?  Do you lose power for having multiple comparisons?  Must you correct for multiple comparisons?  Are the true signatures of local adaptaion that may be unique to the southern population lost when you compare all four populations instead of just S-N?
 
 This is what Matthieu Foll (BayeScan) says:
 > It is true that you lose power by only doing pairwise comparisons. Also, once you will have your 15 pairwise results, what do you do? They are not independent, as populations share some history. So how are you going to assign significance to a given locus? If one outlier pops up in let's say 3 or 4 pairwise comparisons you will be happy? What is the probability that this happens by chance? I know some papers are published with this approach but I personally dislike like.
@@ -65,7 +65,7 @@ This is what Matthieu Foll (BayeScan) says:
 So, indeed, no easy answer, but because our approach is to simply identify "interesting" contigs in the genome, we decided to perform BayeScan on pairs of pops AND five pops together while simply keeping decent records for which BayeScan run the "interesting" label came from.
 
 -- To filter on MAF or not:  The BayeScan manual says this:
-> ... However, in the extreme case of totally uninformative data, the posterior odds will simply be equal to the prior odds. This is for example the case  for uninformative loci such as monomorphic markers or markers with a very low minor allele frequency. We advise people  to exclude  these markers  from  the  analysis. 
+> ... However, in the extreme case of totally uninformative data, the posterior odds will simply be equal to the prior odds. This is for example the case for uninformative loci such as monomorphic markers or markers with a very low minor allele frequency. We advise people to exclude these markers from the analysis. 
 
 So, here, it seems appropriate to remove MAF < 0.05.
 
