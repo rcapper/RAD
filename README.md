@@ -70,7 +70,7 @@ So, no easy answer.  Because our approach is to simply identify "interesting" co
 
 --  MAF:  if you are extracting pairs of pops, do you remove a locus if the MAF is 0.03 in one pop BUT is 0.2 in the other pop?  Does it matter if the minor allele is a different allele in each pop?  (no.)  
 
-Here, my script "vcf_extract_pops_by_MAF.pl" prints out polymorphic SNPs with MAF gt some supplied threshold as long as the MAF is above the threshold in at least ONE population.  Yes, this removes situations where pop1 is 95% allele "A" and pop2 is 95% allele "a" (if the MAF threshold supplied is, for example, 0.1).  You might think that these populations, which are nearly fixed for different alleles and therefore may indeed be really interesting at that particular locus, should be kept but if you're using the MAF threshold then you're using the MAF threshold and you should probably get rid of them.  
+Here, my script **vcf_extract_pops_by_MAF.pl** prints out polymorphic SNPs with MAF gt some supplied threshold as long as the MAF is above the threshold in at least ONE population.  Yes, this removes situations where pop1 is 95% allele "A" and pop2 is 95% allele "a" (if the MAF threshold supplied is, for example, 0.1).  You might think that these populations, which are nearly fixed for different alleles and therefore may indeed be really interesting at that particular locus, should be kept but if you're using the MAF threshold then you're using the MAF threshold and you should probably get rid of them.  
 
 Consider this:
 
@@ -79,10 +79,20 @@ pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 95% | 97% | 0.05 | 0.03 | This locus should clearly be removed.
 95% | 3% | 0.05 | 0.03 | But what about this one?
 
+Or, what about this situation:
+
+pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
+| --- | --- | --- | --- | --- |
+98% | 97% | 0.02 | 0.02 | Both pops have too-low MAF; this locus should clearly be deleted.
+80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't; do you keep this locus?
+
+
+
 Two steps:
 
 1)  Extract pairs of pops
-2)  Apply MAF > 0.05 filtering to all pairwise pop vcfs, AND to all_five_pops.vcf:
+2)  Apply MAF > 0.05 filtering to all pairwise pop vcfs, AND to all_five_pops.vcf 
+How many SNPs result per file?  Can BayeScan actually run on that number of SNPs?  Seems like BayeScan really can only handle ~30k SNPs per run.  If you have more than 30k SNPs, I suggest splitting them into pieces and running BayeScan independently on each set of SNPs, then combining later.
 
 ```
 
