@@ -54,10 +54,6 @@ Also, from an email exchange with Mark Kirkpatrick:
 ---
 Preparing data:
 ####
--- To filter on MAF or not:  The BayeScan manual says this:
-> ... However, in the extreme case of totally uninformative data, the posterior odds will simply be equal to the prior odds. This is for example the case  for uninformative loci such as monomorphic markers or markers with a very low minor allele frequency. We advise people  to exclude  these markers  from  the  analysis. 
-
-So, here, it seems appropriate to remove MAF < 0.05.
 
 -- Pairwise comparisons, or all populations considered together?
 Do you consider loci that are outliers when comparing two pops pairwise, or do you apply BayeScan to all five or six or twenty pops together?  For example, if you have southern, northern, eastern and western pops, do you compare S-N, S-W, S-E, N-W, N-E and E-W, or S-N-E-W at once?  Do you lose power for having multiple comparisons?  Must you correct for those?  Are true signatures of local adaptaion unique to the southern population lost when you compare S-N-E-W instead of S-N?
@@ -66,7 +62,12 @@ This is what Matthieu Foll (BayeScan) says:
 > It is true that you lose power by only doing pairwise comparisons. Also, once you will have your 15 pairwise results, what do you do? They are not independent, as populations share some history. So how are you going to assign significance to a given locus? If one outlier pops up in let's say 3 or 4 pairwise comparisons you will be happy? What is the probability that this happens by chance? I know some papers are published with this approach but I personally dislike like.
 > It is also true that if you have only a few populations leaving in the specific environment you are interested in, the signal will be diluted when mixed with several others... So no easy solution.
 
-So, no easy answer.  Because our approach is to simply identify "interesting" contigs in the genome, we decided to perform BayeScan on pairs of pops AND five pops together, simply keeping decent records for which run the "interesting" contigs came from.
+So, indeed, no easy answer, but because our approach is to simply identify "interesting" contigs in the genome, we decided to perform BayeScan on pairs of pops AND five pops together while simply keeping decent records for which BayeScan run the "interesting" label came from.
+
+-- To filter on MAF or not:  The BayeScan manual says this:
+> ... However, in the extreme case of totally uninformative data, the posterior odds will simply be equal to the prior odds. This is for example the case  for uninformative loci such as monomorphic markers or markers with a very low minor allele frequency. We advise people  to exclude  these markers  from  the  analysis. 
+
+So, here, it seems appropriate to remove MAF < 0.05.
 
 --  MAF:  if you are extracting pairs of pops, do you remove a locus if the MAF is 0.03 in one pop BUT is 0.2 in the other pop?  Does it matter if the minor allele is a different allele in each pop?  (no.)  
 
@@ -86,12 +87,11 @@ pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 98% | 97% | 0.02 | 0.02 | Both pops have too-low MAF; this locus should clearly be deleted.
 80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't; do you keep this locus?
 
-
-
 Two steps:
 
-1)  Extract pairs of pops
-2)  Apply MAF > 0.05 filtering to all pairwise pop vcfs, AND to all_five_pops.vcf 
+1.  Extract pairs of pops
+2.  Apply MAF > 0.05 filtering to all pairwise pop vcfs, AND to all_five_pops.vcf 
+
 How many SNPs result per file?  Can BayeScan actually run on that number of SNPs?  Seems like BayeScan really can only handle ~30k SNPs per run.  If you have more than 30k SNPs, I suggest splitting them into pieces and running BayeScan independently on each set of SNPs, then combining later.
 
 ```
