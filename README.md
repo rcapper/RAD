@@ -42,13 +42,45 @@ When I then used GATK's hard-clipping tool on the sorted.bam file to delete the 
 ### Population Statistics in general:
 ---
 
-To filter by Minor Allele Frequency or not?  See: http://csb.scichina.com:8080/kxtbe/EN/abstract/abstract413250.shtml, "Effects of cutoff thresholds for minor allele frequencies on HapMap resolution: A real dataset-based evaluation of the Chinese Han and Tibetan populations"  Basically you should include all the SNPs.
+To filter by Minor Allele Frequency when calculating statistics or not?  See: http://csb.scichina.com:8080/kxtbe/EN/abstract/abstract413250.shtml, "Effects of cutoff thresholds for minor allele frequencies on HapMap resolution: A real dataset-based evaluation of the Chinese Han and Tibetan populations"  Basically you should include all the SNPs.
 
 Also see: https://www.biomedcentral.com/content/pdf/1753-6561-3-S7-S41.pdf ;"The effect of minor allele frequency on the likelihood of obtaining false positives"; namely, "These results suggest that removal of low MAF SNPs from analysis due to concerns about inflated false-positive results may not be appropriate"
 
 Also, from an email exchange with Mark Kirkpatrick: 
 > I'm working with linkage diseq and Fst at the moment.  The BayeScan manual (Fst) just notes that including low-MAF loci is bad and will skew the results, but doesn't elaborate on why.  I've asked the developer but he's pretty bad about email responses.  And for LD, r^2 is influenced by allele frequencies, so would that matter when comparing pairs of sites with super rare alleles?
 "Yes.  Throwing out real data will bias your statistics."
+
+## BayeScan Fst analysis
+---
+Preparing data:
+####
+-- To filter on MAF or not:  The BayeScan manual says this:
+> ... However, in the extreme case of totally uninformative data, the posterior odds will simply be equal to the prior odds. This is for example the case  for uninformative loci such as monomorphic markers or markers with a very low minor allele frequency. We advise people  to exclude  these markers  from  the  analysis. 
+
+So, here, it seems appropriate to remove MAF < 0.05.
+
+-- Pairwise comparisons, or all populations considered together?
+Do you consider loci that are outliers when comparing two pops pairwise, or do you apply BayeScan to all five or six or twenty pops together?  For example, if you have southern, northern, eastern and western pops, do you compare S-N, S-W, S-E, N-W, N-E and E-W, or S-N-E-W at once?  Do you lose power for having multiple comparisons?  Must you correct for those?  Are true signatures of local adaptaion unique to the southern population lost when you compare S-N-E-W instead of S-N?
+
+This is what Matthieu Foll (BayeScan) says:
+> It is true that you lose power by only doing pairwise comparisons. Also, once you will have your 15 pairwise results, what do you do? They are not independent, as populations share some history. So how are you going to assign significance to a given locus? If one outlier pops up in let's say 3 or 4 pairwise comparisons you will be happy? What is the probability that this happens by chance? I know some papers are published with this approach but I personally dislike like.
+> It is also true that if you have only a few populations leaving in the specific environment you are interested in, the signal will be diluted when mixed with several others... So no easy solution.
+
+So, no easy answer.  Because our approach is to simply identify "interesting" contigs in the genome, we decided to perform BayeScan on pairs of pops AND five pops together, simply keeping decent records for which run the "interesting" contigs came from.
+
+Two steps:
+
+1)  Extract pairs of pops
+2)  Apply MAF > 0.05 filtering to all pairwise pop vcfs, AND to all_five_pops.vcf:
+
+```
+
+```
+
+
+## Pi
+---
+Can you actually calculate pi from RAD data?  Likely not: we are NOT looking at every variant site in the genome, only a subsample.  Unless you had a breakdown of known invariant/variant sites then this won't work; i.e., you'd need to the lengths of each tag and where the SNPs are within those tags, not simply a pretty .vcf file.
 
 
 ## Linkage Disequilibrium
