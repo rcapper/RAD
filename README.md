@@ -65,16 +65,16 @@ The "Ultimate vcf" file (26 Sept 2013):
 3.  has only individuals in which >60% of all loci are genotyped.  
 4.  Remove Reef 21-121, those other-species guys from Night (Ni15, Ni17, Ni18, O166)  (`delete_inds_from_vcf.pl`)
 5.  Remove clones (high relatedness; `find_clones.pl`,`delete_inds_from_vcf.pl`) The following pairs are at least 95% similar:
- 	** K210 = K212 = K213 = K216 (keep K212, has the most genotypic information of the four)
-	** A395 = A397 (not using A reef any more)
-	** K219 = K211 (keep K211)
-	** A412 = Ni16, (delete Ni16, likely a different species)
-	** K4 = O5, (delete both; likely some labeling screw-up)
-	** M17 = M16 (delete M16; M17 has more genotypic information)
+ 	* K210 = K212 = K213 = K216 (keep K212, has the most genotypic information of the four)
+	* A395 = A397 (not using A reef any more)
+	* K219 = K211 (keep K211)
+	* A412 = Ni16, (delete Ni16, likely a different species)
+	* K4 = O5, (delete both; likely some labeling screw-up)
+	* M17 = M16 (delete M16; M17 has more genotypic information)
 6.  Remove all Reef 21-121 (super high Fst between those and all other reefs - 0.2, are likely a different species),  
 7.  Remove those individuals with low heterozygosity (`vcftools --vcf ultimate.vcf --het`) 
-  	** delete those with F values > 0.4 (only Ni15, Ni17, Ni18, which are already deleted)
-	** delete those with F values > 0.3 (Ni2, Ni10, Ni3, Ni5, O3, Ni16)  (whatever, it's okay - Night is just poorly sequenced/genotyped in the first place so we'll probably end up not even using that population)
+  	* delete those with F values > 0.4 (only Ni15, Ni17, Ni18, which are already deleted)
+	* delete those with F values > 0.3 (Ni2, Ni10, Ni3, Ni5, O3, Ni16)  (whatever, it's okay - Night is just poorly sequenced/genotyped in the first place so we'll probably end up not even using that population)
 
 
 
@@ -132,25 +132,34 @@ pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 98% | 97% | 0.02 | 0.02 | Both pops have too-low MAF; this locus should clearly be deleted.
 80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't; do you keep this locus?
 
+
 --- **MAF threshold for filtering:** 
 
 How low is "very low"?  Some lit discards MAF lt 0.25!  (seems pretty high to me).  Do you discard MAF lt 0.05 (for 50 inds * 2 chromosomes = 100 alleles; MAF = 0.05 = 5 alleles)?  MAF lt 0.01 (a single heterozygote among 50 individuals)?  Roesti et al 2012 pretty much says that you should look at your own data closely and see when the Fst graphs stop changing, and use that cutoff.  They also use an "n" threshold instead of a MAF percentage, as in, the minor allele must be seen at least 1 or 4 or 10 (etc) times.  This approach may actually be wise because it doesn't change; for example, within one pop, maybe you're missing data for a few individuals at a particular locus.  This decreases your 
 
 Or, it seems more common to simply discard alleles that are only seen once in the data set.  See: http://hpc.ilri.cgiar.org/training/embo/course_material/genotyping/NGS_and_Genotyping_Rounsley.pdf - "Analyze at the population level, not sample level.  Filter SNPs based on frequency in population; discard SNPs found only in single samples."  Also see: http://rspb.royalsocietypublishing.org/content/277/1701/3725.short - 
 
-This is actually a good idea, especially for Type II B RAD: we can't remove PCR duplicates due to the nature of the digestion, so it's quite possible that an allele seen only once is indeed genotyped due to an artificial increase in read depth via PCR duplication.  Though, do keep in mind that many rare alleles could be very real.
+This is actually a very good idea, especially for Type II B RAD: we can't remove PCR duplicates due to the nature of the digestion, so it's quite possible that an allele seen only once is indeed genotyped due to an artificial increase in read depth via PCR duplication.  Though, do keep in mind that many rare alleles could still be quite real; see Roesti et al 2012 for a paragraph about how many rare variants are totally expected.
 
 --- **What to do with low-MAF loci:** Delete the minor allele, or delete the locus?
 In Stacks, for example, if a locus has a too-low MAF, that minor allele gets deleted such that the locus now looks homozygous.  My preference is to simply delete the entire locus.  I can see arguments for either method and am open to a conversation about it, but it seems that the minor allele is (not always but usually) a true biological signal and shouldn't simply be ignored (see Roesti et al 2012).  If that locus is uninformative, then you should just not consider that locus, rather than squint at it a little bit and massage the data such that the minor allele straight-up disappears.  
 
+--- **Do you filter for MAF within or across populations?** 
+It seems reasonable to make sure that a particular locus' MAF is gt threshold in at least ONE population of the two compared.  Example, if the threshold is "two alleles"/"must be seen at least twice", do you require those two alleles to be found in a single population, or is it okay if there is one allele in one pop and one allele in the other?  
+I think it depends on what kind of threshold you use: like, if you go by counts, maybe it's okay to count across populations?  Or, should the MAF be within-pops?
 
 
+Test this shit out:
+#### BayeScan - Testing for MAF effects.  Run BayeScan on 15k randomly sampled SNPs from KxO population comparison using different MAF cutoffs: 
+1.  All SNPs equally likely to be selected as part of the 15k (no MAF filtering at all)
+2.  Exclude singleton SNPs only (as in, if an allele is only present once in EITHER population/a single alternate-allele-having heterozygote exists in any one pop)
+3.  Exclude SNPs that are only seen twice (as in, a single diploid alt-allele-having homozygote across populations
 
 
-
+#### BayeScan - decisions, data prep, the runs, and processing
 Two steps:
 
-1.  Extract pairs of pops
+1.  Extract pairs of pops from ultimate.vcf
 2.  Apply MAF > 0.05 filtering to all pairwise pop vcfs, AND to all_five_pops.vcf 
 
 How many SNPs result per file?  Can BayeScan actually run on that number of SNPs?  Seems like BayeScan really can only handle ~30k SNPs per run.  If you have more than 30k SNPs, I suggest splitting them into pieces and running BayeScan independently on each set of SNPs, then combining later.
