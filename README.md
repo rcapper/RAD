@@ -123,7 +123,7 @@ Consider this:
 pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 | --- | --- | --- | --- | --- |
 95% | 97% | 0.05 | 0.03 | This locus should clearly be removed.
-95% | 3% | 0.05 | 0.03 | But what about this one?
+95% | 3% | 0.05 | 0.03 | But what about this one?  
 
 Or, what about this situation:
 
@@ -132,6 +132,7 @@ pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 98% | 97% | 0.02 | 0.02 | Both pops have too-low MAF; this locus should clearly be deleted.
 80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't; do you keep this locus?
 
+**my choices:**  Exclude when MAF in both pops 
 
 --- **MAF threshold for filtering:** 
 
@@ -146,7 +147,7 @@ In Stacks, for example, if a locus has a too-low MAF, that minor allele gets del
 
 --- **Do you filter for MAF within or across populations?** 
 It seems reasonable to make sure that a particular locus' MAF is gt threshold in at least ONE population of the two compared.  Example, if the threshold is "two alleles"/"must be seen at least twice", do you require those two alleles to be found in a single population, or is it okay if there is one allele in one pop and one allele in the other?  
-I think it depends on what kind of threshold you use: like, if you go by counts, maybe it's okay to count across populations?  Or, should the MAF be within-pops?
+I think it's probably best to consider MAF as a within-pop thing.  See above tables for considerations about how to handle special cases (for example, 
 
 
 Test this shit out:
