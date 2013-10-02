@@ -46,16 +46,21 @@ To filter by Minor Allele Frequency when calculating statistics or not?  See: ht
 
 Also see: https://www.biomedcentral.com/content/pdf/1753-6561-3-S7-S41.pdf ;"The effect of minor allele frequency on the likelihood of obtaining false positives"; namely, "These results suggest that removal of low MAF SNPs from analysis due to concerns about inflated false-positive results may not be appropriate"
 
+Also see: http://www.biomedcentral.com/content/pdf/1471-2148-12-94.pdf ; "Uninformative polymorphisms bias genome scans for signatures of selection"; "Markers with a very low minor allele frequency therefore lack the adequate sensitivity to capture the historical signatures of drift and hitchhiking, the key processes in genome scans." 
+
 Also, from an email exchange with Mark Kirkpatrick: 
 > I'm working with linkage diseq and Fst at the moment.  The BayeScan manual (Fst) just notes that including low-MAF loci is bad and will skew the results, but doesn't elaborate on why.  I've asked the developer but he's pretty bad about email responses.  And for LD, r^2 is influenced by allele frequencies, so would that matter when comparing pairs of sites with super rare alleles?
 "Yes.  Throwing out real data will bias your statistics."
+
+
+
 
 ## BayeScan Fst analysis
 ---
 Preparing data:
 ####
 
--- Pairwise comparisons, or all populations considered together?
+--- Pairwise comparisons, or all populations considered together?
 Do you consider loci that are outliers when comparing two pops pairwise, or do you apply BayeScan to all five or six or twenty pops together?  For example, if you have southern, northern, eastern and western pops, do you compare S-N, S-W, S-E, N-W, N-E and E-W, or S-N-E-W at once?  Do you lose power for having multiple comparisons?  Must you correct for multiple comparisons?  Are the true signatures of local adaptaion that may be unique to the southern population lost when you compare all four populations instead of just S-N?
 
 This is what Matthieu Foll (BayeScan) says:
@@ -64,12 +69,12 @@ This is what Matthieu Foll (BayeScan) says:
 
 So, indeed, no easy answer, but because our approach is to simply identify "interesting" contigs in the genome, we decided to perform BayeScan on pairs of pops AND five pops together while simply keeping decent records for which BayeScan run the "interesting" label came from.
 
--- To filter on MAF or not:  The BayeScan manual says this:
+--- To filter on MAF or not:  The BayeScan manual says this:
 > ... However, in the extreme case of totally uninformative data, the posterior odds will simply be equal to the prior odds. This is for example the case for uninformative loci such as monomorphic markers or markers with a very low minor allele frequency. We advise people to exclude these markers from the analysis. 
 
-So, here, it seems appropriate to remove MAF < 0.05.
+So, here, it seems appropriate to remove MAF < 0.05, at least for BayeScan Fst calcs
 
---  MAF:  if you are extracting pairs of pops, do you remove a locus if the MAF is 0.03 in one pop BUT is 0.2 in the other pop?  Does it matter if the minor allele is a different allele in each pop?  (no.)  
+---  MAF in general:  if you are extracting pairs of pops, do you remove a locus if the MAF is 0.03 in one pop BUT is 0.2 in the other pop?  Does it matter if the minor allele is a different allele in each pop?  (no.)  
 
 Here, my script **vcf_extract_pops_by_MAF.pl** prints out polymorphic SNPs with MAF gt some supplied threshold as long as the MAF is above the threshold in at least ONE population.  Yes, this removes situations where pop1 is 95% allele "A" and pop2 is 95% allele "a" (if the MAF threshold supplied is, for example, 0.1).  You might think that these populations, which are nearly fixed for different alleles and therefore may indeed be really interesting at that particular locus, should be kept but if you're using the MAF threshold then you're using the MAF threshold and you should probably get rid of them.  
 
@@ -86,6 +91,22 @@ pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 | --- | --- | --- | --- | --- |
 98% | 97% | 0.02 | 0.02 | Both pops have too-low MAF; this locus should clearly be deleted.
 80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't; do you keep this locus?
+
+--- MAF threshold for filtering:  
+
+How low is "very low"?  Some lit discards MAF lt 0.25!  (seems pretty high to me).  Do you discard MAF lt 0.05 (for 50 inds * 2 chromosomes = 100 alleles; MAF = 0.05 = 5 alleles)?  MAF lt 0.01 (a single heterozygote among 50 individuals)?  Roesti et al 2012 pretty much says that you should look at your own data closely and see when the Fst graphs stop changing, and use that cutoff.  They also use an "n" threshold instead of a MAF percentage, as in, the minor allele must be seen at least 1 or 4 or 10 (etc) times.  This approach may actually be wise because it doesn't change; for example, within one pop, maybe you're missing data for a few individuals at a particular locus.  This decreases your 
+
+Or, it seems more common to simply discard alleles that are only seen once in the data set.  See: http://hpc.ilri.cgiar.org/training/embo/course_material/genotyping/NGS_and_Genotyping_Rounsley.pdf - "Analyze at the population level, not sample level.  Filter SNPs based on frequency in population; discard SNPs found only in single samples."  Also see: http://rspb.royalsocietypublishing.org/content/277/1701/3725.short - 
+
+This is actually a good idea, especially for Type II B RAD: we can't remove PCR duplicates due to the nature of the digestion, so it's possible that an allele seen only once is indeed genotyped due to an artificial increase in read depth via PCR duplication. 
+
+--- What to do with low-MAF loci: Delete the minor allele, or delete the locus?
+In Stacks, for example, if a locus has a too-low MAF, that minor allele gets deleted such that the locus now looks homozygous.  My preference is to simply delete the entire locus.  I can see arguments for either method and am open to a conversation about it, but it seems that the minor allele is (not always but usually) a true biological signal and shouldn't simply be ignored (see Roesti et al 2012).  If that locus is uninformative, then you should just not consider that site, rather than squint at it a little bit and massage the data such that the minor allele straight-up disappears.
+
+
+
+
+
 
 Two steps:
 
