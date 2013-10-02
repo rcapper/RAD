@@ -59,10 +59,20 @@ When I then used GATK's hard-clipping tool on the sorted.bam file to delete the 
 
 ## VCF filtering
 The "Ultimate vcf" file (26 Sept 2013): 
-	1.  filtered for retaining 90% of "true variants" (as determined by the GATK UnifiedGenotyper VQSR stage)
-	2.  has only loci that are genotyped in >80% of individuals
-	3.  has only individuals in which >60% of all loci are genotyped.  
-1.  Remove Reef 21-121, clones (high relatedness), those individuals with low heterozygosity, low genotyping rates
+	
+	[x] 1.  filtered for retaining 90% of "true variants" (as determined by the GATK UnifiedGenotyper VQSR stage)
+	[x] 2.  has only loci that are genotyped in >80% of individuals
+	[x] 3.  has only individuals in which >60% of all loci are genotyped.  
+	[x] 4.  Remove Reef 21-121, those other-species guys from Night (Ni15, Ni17, Ni18, O166)  (delete_inds_from_vcf.pl)
+	5.  Remove clones (high relatedness; find_clones.pl). (delete_inds_from_vcf.pl) The following pairs are at least 95% similar:
+	 	* K210 = K212 = K213 = K216 (keep K212, has the most genotypic information of the four)
+		* A395 = A397 (not using A reef any more)
+		* K219 = K211 (keep K211)
+		* A412 = Ni16, (delete Ni16, likely a different species)
+		* K4 = O5, (delete both; likely some labeling screw-up)
+		* M17 = M16 (delete M16; M17 has more genotypic information)
+	6.  Remove all Reef 21-121 (super high Fst between those and all other reefs - 0.2),  
+	7.  those individuals with low heterozygosity, low genotyping rates
 
 
 
