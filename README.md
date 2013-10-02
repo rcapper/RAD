@@ -52,11 +52,17 @@ When I then used GATK's hard-clipping tool on the sorted.bam file to delete the 
 ---
 
 ## Genotype callers:
----
 1.  Samtools mpileup
 2.  in-house haplotype caller
 3.  GATK UnifiedGenotyper
 4.  GATK HaplotypeCaller (can't get it to work)
+
+## VCF filtering
+The "Ultimate vcf" file (26 Sept 2013): 
+	1.  filtered for retaining 90% of "true variants" (as determined by the GATK UnifiedGenotyper VQSR stage)
+	2.  has only loci that are genotyped in >80% of individuals
+	3.  has only individuals in which >60% of all loci are genotyped.  
+1.  Remove Reef 21-121, clones (high relatedness), those individuals with low heterozygosity, low genotyping rates
 
 
 
@@ -121,8 +127,8 @@ Or, it seems more common to simply discard alleles that are only seen once in th
 
 This is actually a good idea, especially for Type II B RAD: we can't remove PCR duplicates due to the nature of the digestion, so it's quite possible that an allele seen only once is indeed genotyped due to an artificial increase in read depth via PCR duplication.  Though, do keep in mind that many rare alleles could be very real.
 
---- What to do with low-MAF loci: Delete the minor allele, or delete the locus?
-In Stacks, for example, if a locus has a too-low MAF, that minor allele gets deleted such that the locus now looks homozygous.  My preference is to simply delete the entire locus.  I can see arguments for either method and am open to a conversation about it, but it seems that the minor allele is (not always but usually) a true biological signal and shouldn't simply be ignored (see Roesti et al 2012).  If that locus is uninformative, then you should just not consider that site, rather than squint at it a little bit and massage the data such that the minor allele straight-up disappears.
+--- **What to do with low-MAF loci:** Delete the minor allele, or delete the locus?
+In Stacks, for example, if a locus has a too-low MAF, that minor allele gets deleted such that the locus now looks homozygous.  My preference is to simply delete the entire locus.  I can see arguments for either method and am open to a conversation about it, but it seems that the minor allele is (not always but usually) a true biological signal and shouldn't simply be ignored (see Roesti et al 2012).  If that locus is uninformative, then you should just not consider that locus, rather than squint at it a little bit and massage the data such that the minor allele straight-up disappears.  
 
 
 
