@@ -153,6 +153,21 @@ In Stacks, for example, if a locus has a too-low MAF, that minor allele gets del
 It seems reasonable to make sure that a particular locus' MAF is gt threshold in at least ONE population of the two compared.  For example, if the threshold is "two alleles"/"must be seen at least twice", do you require those two alleles to be found in a single population, or is it okay if there is one allele in one pop and one allele in the other?  Is it okay if the MAF in pop1 is 0.5 but the MAF in pop2 is 0.03?  (yes, that's a true signal)
 I think it's probably best to consider MAF as a within-pop thing.  
 
+--- **Coding issues and solutions**
+I scripted `vcf_extract_by_MAF.pl` to calculate MAF within pops instead of across them.  This flexibility means that it's possible for the minor alleles to be different between pop1 and pop2; for example, pop1 may be homozygous reference (allele 0, frequency = 1) while pop2 is nearly-but-not-quite homozygous for the alternate allele (allele 1, frequency = 0.95).  This is actually the kind of signal we're looking for and we'd be remiss to throw it out.  However, a word of caution about coding this type of thing:  
+
+My script calculates MAF by counting the number of times each allele is seen within a pop, finding which allele is rarer, then dividing that rare allele's count by twice the number of individuals with genotyped data at that SNP.  So, if you're a homozygote, there is only one allele seen in the data, so the MAF will get calculated as 1 and not as 0.  If pop2 is het and the rare allele is the SAME as the homozyg allele in pop1, then everything is fine.  However, if pop2 is het and the rare allele is DIFFERENT than the homozyg allele in pop1, then the true MAF of pop1 is 0 and not 1.
+
+Imagine that pop1 has the following allelic composition: {0, 0, 0, 0}.  The frequency of allele 0 is 1; the freq of allele 1 is 0.  MAF gets calculated as 1.
+Now imagine that pop2 looks like this: {0, 0, 0, 1}.  Freq{0} = 0.75, freq{1} = 0.25.  MAF gets calculated as 0.25.
+It would be erroneous to compare pop1's MAF=1 to pop2's MAF=0.25.  The MAF of pop1, relative to the MAF of pop2, is actually 0.  
+The workaround is actually pretty simple: for every pop1 MAF = 1, double check to see if the identified rare alleles are the same between pops.  If they are NOT the same alleles, change pop1 MAF to 0.  If they ARE the same alleles, then everything is cool and you can indeed compare MAFs between the pops.  
+
+
+
+
+
+
 
 
 Test this shit out:
