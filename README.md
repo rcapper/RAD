@@ -124,13 +124,7 @@ pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 | --- | --- | --- | --- | --- |
 95% | 97% | 0.05 | 0.03 | This locus should clearly be removed.
 95% | 3% | 0.05 | 0.03 | But what about this one?  
-
-Or, what about this situation:
-
-pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
-| --- | --- | --- | --- | --- |
-98% | 97% | 0.02 | 0.03 | Both pops have too-low MAF; this locus should clearly be deleted.
-80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't; do you keep this locus?
+80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't;
 
 **my choices:**  
 	* Exclude a locus when MAF in both pops is too low;
@@ -161,8 +155,12 @@ Test this shit out:
 4.  Require SNPs to have MAF gt 0.1 in at least one pop
 5.  Require SNPs to have MAF gt 0.25 in BOTH pops
 
-1.  Apply filters on the vcf
-2.  
+
+1.  Extract pairwise pops; 
+2.  apply MAF filters on KxO.ultimate.vcf
+3.  vcf -> genepop
+4.  genepop -> bayescan
+5.  run bayescan
 
 
 #### BayeScan - decisions, data prep, the runs, and processing
