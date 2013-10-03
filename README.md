@@ -126,10 +126,11 @@ pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 95% | 3% | 0.05 | 0.03 | But what about this one?  
 80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't;
 
-**my choices:**  
-	* Exclude a locus when MAF in both pops is too low;
-	* Include the locus as long as the MAF in ONE pop is high enough, even if it's below threshold in the other 
-	* Include the locus even if MAF is below threshold, AS LONG AS the MAF is for a DIFFERENT allele (i.e., almost fixed but for opposite/different alleles)
+**my decisions:**  
+	*  Exclude a locus when MAF in both pops is too low;
+	*  Include the locus as long as the MAF in ONE pop is high enough, even if it's below threshold in the other 
+	*  Include the locus even if MAF is below threshold, AS LONG AS the MAF is for a DIFFERENT allele (i.e., almost fixed but for opposite/different alleles)
+
 
 --- **MAF threshold for filtering:** 
 How low is "very low"?  Some lit discards MAF lt 0.25 (Bradbury et al 2010, Atlantic cod paper)!  (seems pretty high to me).  Do you discard MAF lt 0.05 (for 50 inds * 2 chromosomes = 100 alleles; MAF = 0.05 = 5 alleles)?  MAF lt 0.01 (a single heterozygote among 50 individuals)?  Roesti et al 2012 pretty much says that you should look at your own data closely and see when the Fst graphs stop changing, and use that cutoff.  They also use an "n" threshold instead of a MAF percentage, as in, the minor allele must be seen at least 1 or 4 or 10 (etc) times.  
