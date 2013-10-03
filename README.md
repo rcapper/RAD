@@ -133,7 +133,7 @@ pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't
 
 **my decisions:**  
-	*  _Exclude a locus when MAF in both pops is too low_;  "low" may have to be empirically determined, as in the Roesti paper, i.e. "try a bunch of cutoffs and stop when the Fst plots quit changing."
+	*  _Exclude a locus when MAF in both pops is too low_;  "low" may have to be empirically determined, as in the Roesti paper, i.e. "try a bunch of cutoffs and stop when the Fst plots quit changing."  Note: make sure that the MAFs are relative to the same allele here.  It would be a shame to delete a locus at which pop1 is 95% 'A' and pop2 is 5% 'A'.
 	*  _Include the locus as long as the MAF in ONE pop is high enough_, even if it's below threshold in the other 
 	*  _Include the locus even if MAF is below threshold, AS LONG AS the MAF is for a DIFFERENT allele_ (i.e., almost fixed but for opposite/different alleles)
 	*  _Exclude a locus is there are fewer than 5 individuals genotyped PER pop_.  Note: one of the criteria we applied to making the multi-pop vcf in the first place was that each SNP had to be genotyped in at least 80% of individuals.  I can imagine a circumstance where a locus is poorly represented or maybe missing entirely in one pop, but genotyped in 100% of individuals from all other pops.  I'd like to exclude these cases, so that's how I coded it.
@@ -154,15 +154,18 @@ It seems reasonable to make sure that a particular locus' MAF is gt threshold in
 I think it's probably best to consider MAF as a within-pop thing.  
 
 --- **Coding issues and solutions**
-I scripted `vcf_extract_by_MAF.pl` to calculate MAF within pops instead of across them.  This flexibility means that it's possible for the minor alleles to be different between pop1 and pop2; for example, pop1 may be homozygous reference (allele 0, frequency = 1) while pop2 is nearly-but-not-quite homozygous for the alternate allele (allele 1, frequency = 0.95).  This is actually the kind of signal we're looking for and we'd be remiss to throw it out.  However, a word of caution about coding this type of thing:  
 
-My script calculates MAF by counting the number of times each allele is seen within a pop, finding which allele is rarer, then dividing that rare allele's count by twice the number of individuals with genotyped data at that SNP.  So, if you're a homozygote, there is only one allele seen in the data, so the MAF will get calculated as 1 and not as 0.  If pop2 is het and the rare allele is the SAME as the homozyg allele in pop1, then everything is fine.  However, if pop2 is het and the rare allele is DIFFERENT than the homozyg allele in pop1, then the true MAF of pop1 is 0 and not 1.
+I scripted `vcf_extract_by_MAF.pl` to calculate MAF within pops instead of across them.  This flexibility means that it's possible for the minor alleles to be different between pop1 and pop2; for example, pop1 may be homozygous reference (allele 0, frequency = 1) while pop2 is nearly-but-not-quite homozygous for the alternate allele (allele 0, frequency = 0.05).  This is actually the kind of signal we're looking for and we'd be remiss to throw it out.  However, a word of caution about coding this type of thing:  
+
+My script calculates MAF by counting the number of times each allele is seen within a pop, finding which allele is rarer, then dividing that rare allele's count by twice the number of individuals with genotyped data at that SNP.  So, if you're a homozygote, there is only one allele seen in the data, which is then considered the 'rare' allele, resulting in the MAF being calculated as 1 and not as 0.  If pop2 is het and the rare allele is the SAME as the homozyg allele in pop1, then everything is fine.  However, if pop2 is het and the rare allele is DIFFERENT than the homozyg allele in pop1, then the true MAF of pop1 is 0 and not 1.
 
 Imagine that pop1 has the following allelic composition: {0, 0, 0, 0}.  The frequency of allele 0 is 1; the freq of allele 1 is 0.  MAF gets calculated as 1.
 Now imagine that pop2 looks like this: {0, 0, 0, 1}.  Freq{0} = 0.75, freq{1} = 0.25.  MAF gets calculated as 0.25.
 It would be erroneous to compare pop1's MAF=1 to pop2's MAF=0.25.  The MAF of pop1, relative to the MAF of pop2, is actually 0.  
+
 The workaround is actually pretty simple: for every pop1 MAF = 1, double check to see if the identified rare alleles are the same between pops.  If they are NOT the same alleles, change pop1 MAF to 0.  If they ARE the same alleles, then everything is cool and you can indeed compare MAFs between the pops.  
 
+So now you may be asking, if it's so important to make sure that the MAFs refer to the same allele when one pop is homozyg, then wouldn't it be important to make sure you're comparing the same alleles regardless of homozygosity?  Well, not really.  I want to make sure that loci that are nearly-but-not-quite fixed for different alleles between two pops don't get thrown out, but that's easy.  Basically, you 
 
 
 
