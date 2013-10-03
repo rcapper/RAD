@@ -114,22 +114,29 @@ So, indeed, no easy answer, but because our approach is to simply identify "inte
 
 So, here, it seems appropriate to remove MAF < 0.05, at least for BayeScan Fst calcs
 
----  **MAF in general:**  if you are extracting pairs of pops, do you remove a locus if the MAF is 0.03 in one pop BUT is 0.2 in the other pop?  Does it matter if the minor allele is a different allele in each pop?  (no.)  
+---  **MAF in general:**  Definition and considerations
 
-Here, my script **vcf_extract_pops_by_MAF.pl** prints out polymorphic SNPs with MAF gt some supplied threshold as long as the MAF is above the threshold in at least ONE population.  Yes, this removes situations where pop1 is 95% allele "A" and pop2 is 95% allele "a" (if the MAF threshold supplied is, for example, 0.1).  You might think that these populations, which are nearly fixed for different alleles and therefore may indeed be really interesting at that particular locus, should be kept but if you're using the MAF threshold then you're using the MAF threshold and you should probably get rid of them.  
+_Definition:_ MAF can either be considered as the frequency of the real minor allele, or simply as the frequency of the ALTERNATIVE/non-reference allele.  I think the latter definition is commonly used, but the alt allele is defined simply through comparison to a genome, which is usually derived from a single individual.  That's biologically and statistically meaningless, if a conventional definition.  The informative/uninformative SNP label I'm trying to apply to my data set is relevant to the actual freq instead, not some arbitrary 'ref'/'alt' status.
+
+Therefore, my script calculates the freq of the TRUE minor allele and only prints out SNPs that are above whatever supplied threshold in at least one pop.  It also requires each locus to be genotyped in at least five individuals per population.  
+
+_Considerations:_
+
+if you are extracting pairs of pops, do you remove a locus if the MAF is 0.03 in one pop BUT is 0.2 in the other pop? (no.) Does it matter if the minor allele is a different allele in each pop?  (yes.)  What is the cutoff threshold for MAF?  How rare does an allele have to be to be considered an uninformative SNP?
 
 Consider this:
 
 pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 | --- | --- | --- | --- | --- |
-95% | 97% | 0.05 | 0.03 | This locus should clearly be removed.
+95% | 97% | 0.05 | 0.03 | This locus is uninformative
 95% | 3% | 0.05 | 0.03 | But what about this one?  
-80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't;
+80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't
 
 **my decisions:**  
-	*  Exclude a locus when MAF in both pops is too low;
-	*  Include the locus as long as the MAF in ONE pop is high enough, even if it's below threshold in the other 
-	*  Include the locus even if MAF is below threshold, AS LONG AS the MAF is for a DIFFERENT allele (i.e., almost fixed but for opposite/different alleles)
+	*  _Exclude a locus when MAF in both pops is too low_;  "low" may have to be empirically determined, as in the Roesti paper, i.e. "try a bunch of cutoffs and stop when the Fst plots quit changing."
+	*  _Include the locus as long as the MAF in ONE pop is high enough_, even if it's below threshold in the other 
+	*  _Include the locus even if MAF is below threshold, AS LONG AS the MAF is for a DIFFERENT allele_ (i.e., almost fixed but for opposite/different alleles)
+	*  _Exclude a locus is there are fewer than 5 individuals genotyped PER pop_.  Note: one of the criteria we applied to making the multi-pop vcf in the first place was that each SNP had to be genotyped in at least 80% of individuals.  I can imagine a circumstance where a locus is poorly represented or maybe missing entirely in one pop, but genotyped in 100% of individuals from all other pops.  I'd like to exclude these cases, so that's how I coded it.
 
 
 --- **MAF threshold for filtering:** 
@@ -143,7 +150,7 @@ This is actually a very good idea, especially for Type II B RAD: we can't remove
 In Stacks, for example, if a locus has a too-low MAF, that minor allele gets deleted such that the locus now looks homozygous.  My preference is to simply delete the entire locus.  I can see arguments for either method and am open to a conversation about it, but it seems that the minor allele is (not always but usually) a true biological signal and shouldn't simply be ignored (see Roesti et al 2012).  If that locus is uninformative, then you should just not consider that locus, rather than squint at it a little bit and massage the data such that the minor allele straight-up disappears.  
 
 --- **Do you filter for MAF within or across populations?** 
-It seems reasonable to make sure that a particular locus' MAF is gt threshold in at least ONE population of the two compared.  For example, if the threshold is "two alleles"/"must be seen at least twice", do you require those two alleles to be found in a single population, or is it okay if there is one allele in one pop and one allele in the other?  
+It seems reasonable to make sure that a particular locus' MAF is gt threshold in at least ONE population of the two compared.  For example, if the threshold is "two alleles"/"must be seen at least twice", do you require those two alleles to be found in a single population, or is it okay if there is one allele in one pop and one allele in the other?  Is it okay if the MAF in pop1 is 0.5 but the MAF in pop2 is 0.03?  (yes, that's a true signal)
 I think it's probably best to consider MAF as a within-pop thing.  
 
 
@@ -157,8 +164,10 @@ Test this shit out:
 5.  Require SNPs to have MAF gt 0.25 in BOTH pops
 
 
-1.  Extract pairwise pops; 
-2.  apply MAF filters on KxO.ultimate.vcf
+
+1.  Extract pairwise pops based on MAF cutoffs.  
+	* `vcf_extract_pops_by_MAF.pl` v. 2 Oct 2013 R. Capper to extract pairwise populations and delete loci based on MAF percentage threshold.
+	* ` ` v. 2 Oct 2013 R. Capper to extract pairwise populations and delete loci based on number of times an allele is encountered (remove singleton alleles, alleles seen only twice, etc)
 3.  vcf -> genepop
 4.  genepop -> bayescan
 5.  run bayescan
