@@ -129,32 +129,40 @@ Or, what about this situation:
 
 pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 | --- | --- | --- | --- | --- |
-98% | 97% | 0.02 | 0.02 | Both pops have too-low MAF; this locus should clearly be deleted.
+98% | 97% | 0.02 | 0.03 | Both pops have too-low MAF; this locus should clearly be deleted.
 80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't; do you keep this locus?
 
-**my choices:**  Exclude when MAF in both pops 
+**my choices:**  
+	* Exclude a locus when MAF in both pops is too low;
+	* Include the locus as long as the MAF in ONE pop is high enough, even if it's below threshold in the other 
+	* Include the locus even if MAF is below threshold, AS LONG AS the MAF is for a DIFFERENT allele (i.e., almost fixed but for opposite/different alleles)
 
 --- **MAF threshold for filtering:** 
+How low is "very low"?  Some lit discards MAF lt 0.25 (Bradbury et al 2010, Atlantic cod paper)!  (seems pretty high to me).  Do you discard MAF lt 0.05 (for 50 inds * 2 chromosomes = 100 alleles; MAF = 0.05 = 5 alleles)?  MAF lt 0.01 (a single heterozygote among 50 individuals)?  Roesti et al 2012 pretty much says that you should look at your own data closely and see when the Fst graphs stop changing, and use that cutoff.  They also use an "n" threshold instead of a MAF percentage, as in, the minor allele must be seen at least 1 or 4 or 10 (etc) times.  
 
-How low is "very low"?  Some lit discards MAF lt 0.25!  (seems pretty high to me).  Do you discard MAF lt 0.05 (for 50 inds * 2 chromosomes = 100 alleles; MAF = 0.05 = 5 alleles)?  MAF lt 0.01 (a single heterozygote among 50 individuals)?  Roesti et al 2012 pretty much says that you should look at your own data closely and see when the Fst graphs stop changing, and use that cutoff.  They also use an "n" threshold instead of a MAF percentage, as in, the minor allele must be seen at least 1 or 4 or 10 (etc) times.  This approach may actually be wise because it doesn't change; for example, within one pop, maybe you're missing data for a few individuals at a particular locus.  This decreases your 
+Or, it seems more common to simply discard alleles that are only seen once in the data set.  See: http://hpc.ilri.cgiar.org/training/embo/course_material/genotyping/NGS_and_Genotyping_Rounsley.pdf - "Analyze at the population level, not sample level.  Filter SNPs based on frequency in population; discard SNPs found only in single samples."  Also see: http://rspb.royalsocietypublishing.org/content/277/1701/3725.short - "Parallel adaptive evolution of Atlantic cod on both sides of the Atlantic Ocean in response to temperature" Bradbury et al 2010
 
-Or, it seems more common to simply discard alleles that are only seen once in the data set.  See: http://hpc.ilri.cgiar.org/training/embo/course_material/genotyping/NGS_and_Genotyping_Rounsley.pdf - "Analyze at the population level, not sample level.  Filter SNPs based on frequency in population; discard SNPs found only in single samples."  Also see: http://rspb.royalsocietypublishing.org/content/277/1701/3725.short - 
-
-This is actually a very good idea, especially for Type II B RAD: we can't remove PCR duplicates due to the nature of the digestion, so it's quite possible that an allele seen only once is indeed genotyped due to an artificial increase in read depth via PCR duplication.  Though, do keep in mind that many rare alleles could still be quite real; see Roesti et al 2012 for a paragraph about how many rare variants are totally expected.
+This is actually a very good idea, especially for Type II B RAD: we can't remove PCR duplicates due to the nature of the digestion, so it's quite possible that an allele seen only once is indeed genotyped due to an artificial increase in read depth via PCR duplication.  Though, do keep in mind that many rare alleles could still be quite real; see Roesti et al 2012 for a paragraph about how lots of rare variants are totally expected.
 
 --- **What to do with low-MAF loci:** Delete the minor allele, or delete the locus?
 In Stacks, for example, if a locus has a too-low MAF, that minor allele gets deleted such that the locus now looks homozygous.  My preference is to simply delete the entire locus.  I can see arguments for either method and am open to a conversation about it, but it seems that the minor allele is (not always but usually) a true biological signal and shouldn't simply be ignored (see Roesti et al 2012).  If that locus is uninformative, then you should just not consider that locus, rather than squint at it a little bit and massage the data such that the minor allele straight-up disappears.  
 
 --- **Do you filter for MAF within or across populations?** 
-It seems reasonable to make sure that a particular locus' MAF is gt threshold in at least ONE population of the two compared.  Example, if the threshold is "two alleles"/"must be seen at least twice", do you require those two alleles to be found in a single population, or is it okay if there is one allele in one pop and one allele in the other?  
-I think it's probably best to consider MAF as a within-pop thing.  See above tables for considerations about how to handle special cases (for example, 
+It seems reasonable to make sure that a particular locus' MAF is gt threshold in at least ONE population of the two compared.  For example, if the threshold is "two alleles"/"must be seen at least twice", do you require those two alleles to be found in a single population, or is it okay if there is one allele in one pop and one allele in the other?  
+I think it's probably best to consider MAF as a within-pop thing.  
+
 
 
 Test this shit out:
-#### BayeScan - Testing for MAF effects.  Run BayeScan on 15k randomly sampled SNPs from KxO population comparison using different MAF cutoffs: 
-1.  All SNPs equally likely to be selected as part of the 15k (no MAF filtering at all)
+#### BayeScan - Testing for MAF effects.  Run BayeScan on 30k randomly sampled SNPs from KxO population comparison using different MAF cutoffs: 
+1.  All SNPs equally likely to be selected as part of the 30k (no MAF filtering at all)
 2.  Exclude singleton SNPs only (as in, if an allele is only present once in EITHER population/a single alternate-allele-having heterozygote exists in any one pop)
 3.  Exclude SNPs that are only seen twice (as in, a single diploid alt-allele-having homozygote across populations
+4.  Require SNPs to have MAF gt 0.1 in at least one pop
+5.  Require SNPs to have MAF gt 0.25 in BOTH pops
+
+1.  Apply filters on the vcf
+2.  
 
 
 #### BayeScan - decisions, data prep, the runs, and processing
