@@ -167,28 +167,28 @@ It would be erroneous to compare pop1's MAF=1 to pop2's MAF=0.25.  The MAF of po
 The workaround is actually pretty simple: for every pop1 or pop2 MAF = 1, double check to see if the identified rare alleles are the same between pops.  If they are NOT the same alleles, change pop1 MAF to 0.  If they ARE the same alleles, then everything is cool and you can indeed compare MAFs between the pops.  
 
 This is how I scripted the rest of the MAF requirements in `vcf_extract_by_MAF.pl` v. 2Oct2013, just for documentation:
-+  $low_p1 or $low_p2 refer to the minor allele state (as in, "0" = reference or "1" = alternate, or even "7" if there are that many alleles) in each pop
-+  $minor_1 or $minor_2 refer to the actual MAF within each population
-+  $p1_allele or $p2_allele refer to the number of alleles seen total; as in, "1" allele for a monomorphic pop, "2" for a het pop, or "7" for a hyper-variable pop, etc
++  `$low_p1` or `$low_p2` refer to the minor allele state (as in, "0" = reference or "1" = alternate, or even "7" if there are that many alleles) in each pop
++  `$minor_1` or `$minor_2` refer to the actual MAF within each population
++  `$p1_allele` or `$p2_allele` refer to the number of alleles seen total; as in, "1" allele for a monomorphic pop, "2" for a het pop, or "7" for a hyper-variable pop, etc
 
 If the rare alleles are different between pops AND the MAF = 1 in either pop, reset MAF to equal 0 instead:
-+  if (($low_p1 != $low_p2) && ($minor_1 == 1)) {$minor_1 = 0;}
-+  if (($low_p1 != $low_p2) && ($minor_2 == 1)) {$minor_2 = 0;}
++  `if (($low_p1 != $low_p2) && ($minor_1 == 1)) {$minor_1 = 0;}`
++  `if (($low_p1 != $low_p2) && ($minor_2 == 1)) {$minor_2 = 0;}`
 
 If the rare alleles are the SAME between pops AND only a single allele is seen in both pops (i.e., both pops are monomorphic for the same allele), make a note of this and move on; DON'T consider or print out these SNPs
-+  if (($low_p1 == $low_p2) && ($p1_allele==1) && ($p2_allele==1)) {$monomorph++;next;}
++  `if (($low_p1 == $low_p2) && ($p1_allele==1) && ($p2_allele==1)) {$monomorph++;next;}`
 
 If the rare alleles are the SAME between pops AND the MAF is below the threshold in BOTH pops, count and skip.  It's okay if a single pop has low MAF but the other doesn't.  It is also okay if MAF is too low in BOTH pops as long as it is for different SNPs.  Remember, as per the discussion above, if the MAF in one pop is calculated as 1, the rare allele states are compared and if the pops' MAFs were calculated relative to different alleles, MAF=1 is reset to MAF=0 and will therefore usually be below any threshold.  (note for clarity: my script uses the syntax 'less than' whatever threshold, not 'less than or equal to' so if you supply the threshold as 0 these guys will not get discarded)
-+  if (($low_p1 == $low_p2) && ($minor_1<$threshold) && ($minor_2<$threshold)) {$low_maf++;next;}
++  `if (($low_p1 == $low_p2) && ($minor_1<$threshold) && ($minor_2<$threshold)) {$low_maf++;next;}`
 
 If the rare alleles are different between pops AND only a single allele is seen in both pops (i.e., each pop is totally fixed for different alleles), make a note of how many times this happens, the positions of where that occurs, and keep going (don't skip these SNPs):
-+  if (($low_p1 != $low_p2) && ($p1_allele==1) && ($p2_allele==1)) {$counter++;$fixed{$chrom}{$pos}++;}
++  `if (($low_p1 != $low_p2) && ($p1_allele==1) && ($p2_allele==1)) {$counter++;$fixed{$chrom}{$pos}++;}`
 
 this is just for fun; checks to see how many times you see alleles that are almost fixed in each pop but for different alleles
-+  if (($low_p1 != $low_p2) && ($minor_1<$threshold) && ($minor_2<$threshold)) {$almost_fixed++;}
++  `if (($low_p1 != $low_p2) && ($minor_1<$threshold) && ($minor_2<$threshold)) {$almost_fixed++;}`
 
 this is also just for fun; checks to see how many times the minor allele is below the threshold in ONE pop but NOT in the other; i.e., MAF pop1 = 0.2, MAF pop2 = 0.03; you want to keep these guys
-+  if (($low_p1 == $low_p2) && (($minor_1<$threshold)|($minor_2<$threshold))) {$one_below++;}
++  `if (($low_p1 == $low_p2) && (($minor_1<$threshold)|($minor_2<$threshold))) {$one_below++;}`
     
 
 
