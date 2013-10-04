@@ -133,10 +133,10 @@ pop1 allele "A" | pop2 allele "A" | MAF pop1 | MAF pop2 | notes
 80% | 98% | 0.20 | 0.02 | One pop has a too-low MAF but the other doesn't
 
 **my decisions:**  
-	*  _Exclude a locus when MAF in both pops is too low_;  "low" may have to be empirically determined, as in the Roesti paper, i.e. "try a bunch of cutoffs and stop when the Fst plots quit changing."  Note: make sure that the MAFs are relative to the same allele here.  It would be a shame to delete a locus at which pop1 is 95% 'A' and pop2 is 5% 'A'.
-	*  _Include the locus as long as the MAF in ONE pop is high enough_, even if it's below threshold in the other 
-	*  _Include the locus even if MAF is below threshold, AS LONG AS the MAF is for a DIFFERENT allele_ (i.e., almost fixed but for opposite/different alleles)
-	*  _Exclude a locus is there are fewer than 5 individuals genotyped PER pop_.  Note: one of the criteria we applied to making the multi-pop vcf in the first place was that each SNP had to be genotyped in at least 80% of individuals.  I can imagine a circumstance where a locus is poorly represented or maybe missing entirely in one pop, but genotyped in 100% of individuals from all other pops.  I'd like to exclude these cases, so that's how I coded it.
+	**  <u>Exclude a locus when MAF in both pops is too low</u>;  "low" may have to be empirically determined, as in the Roesti paper, i.e. "try a bunch of cutoffs and stop when the Fst plots quit changing."  Note: make sure that the MAFs are relative to the same allele here.  It would be a shame to delete a locus at which pop1 is 95% 'A' and pop2 is 5% 'A'.
+	**  _Include the locus as long as the MAF in ONE pop is high enough_, even if it's below threshold in the other 
+	**  _Include the locus even if MAF is below threshold, AS LONG AS the MAF is for a DIFFERENT allele_ (i.e., almost fixed but for opposite/different alleles)
+	**  _Exclude a locus is there are fewer than 5 individuals genotyped PER pop_.  Note: one of the criteria we applied to making the multi-pop vcf in the first place was that each SNP had to be genotyped in at least 80% of individuals.  I can imagine a circumstance where a locus is poorly represented or maybe missing entirely in one pop, but genotyped in 100% of individuals from all other pops.  I'd like to exclude these cases, so that's how I coded it.
 
 
 --- **MAF threshold for filtering:** 
