@@ -172,8 +172,9 @@ This is how I scripted the rest of the MAF requirements in `vcf_extract_by_MAF.p
 +  `$p1_allele` or `$p2_allele` refer to the number of alleles seen total; as in, "1" allele for a monomorphic pop, "2" for a het pop, or "7" for a hyper-variable pop, etc
 
 If the rare alleles are different between pops AND the MAF = 1 in either pop, reset MAF to equal 0 instead:
-+  `if (($low_p1 != $low_p2) && ($minor_1 == 1)) {$minor_1 = 0;}`
-+  `if (($low_p1 != $low_p2) && ($minor_2 == 1)) {$minor_2 = 0;}`
+```if (($low_p1 != $low_p2) && ($minor_1 == 1)) {$minor_1 = 0;}```
+```if (($low_p1 != $low_p2) && ($minor_2 == 1)) {$minor_2 = 0;}```
+
 
 If the rare alleles are the SAME between pops AND only a single allele is seen in both pops (i.e., both pops are monomorphic for the same allele), make a note of this and move on; DON'T consider or print out these SNPs
 +  `if (($low_p1 == $low_p2) && ($p1_allele==1) && ($p2_allele==1)) {$monomorph++;next;}`
