@@ -156,40 +156,37 @@ I think it's probably best to consider MAF as a within-pop thing.
 
 --- **Coding issues and solutions**
 
-I scripted `vcf_extract_by_MAF.pl` to calculate MAF within pops instead of across them.  This flexibility means that it's possible for the minor alleles to be different between pop1 and pop2; for example, pop1 may be homozygous reference (allele 0, frequency = 1) while pop2 is nearly-but-not-quite homozygous for the alternate allele (allele 0, frequency = 0.05).  This is actually the kind of signal we're looking for and we'd be remiss to throw it out.  However, a word of caution about coding this type of thing:  
+There are three (four) methods for calculating MAF:
 
-My script calculates MAF by counting the number of times each allele is seen within a pop, finding which allele is rarer, then dividing that rare allele's count by twice the number of individuals with genotyped data at that SNP.  So, if you're a homozygote, there is only one allele seen in the data, which is then considered the 'rare' allele, resulting in the MAF being calculated as 1 and not as 0.  If pop2 is het and the rare allele is the SAME as the homozyg allele in pop1, then everything is fine.  However, if pop2 is het and the rare allele is DIFFERENT than the homozyg allele in pop1, then the true MAF of pop1 is 0 and not 1.
+1.  By raw counts, across populations: `vcf_extract_by_MAF_counts.pl`, v. 9 Oct 2013.  This is the easiest way to do it for sure, but counting rare alleles does not account for changing number of genotyped individuals at a particular locus.  For example, maybe you have 20 dudes but only 10 are genotyped at a certain locus.  Is it better to insist on seeing 2 alleles no matter if you have 20 dudes (MAF = 0.05) or if you have 10 (MAF = 0.1)?  
+2.  By raw counts, within populations.  This is tricky to script, at least for me, and likely not necessary.  This introduces a whole lot of conditions that may be stupid.  For example, 
+	+ monomorphs get thrown out.  
+ 	+ if the rare allele is below threshold in BOTH pops, clearly, exclude it.  
+ 	+ If it's below in one pop but above in the other, then maybe keep that locus.
+ 	+ If it's below threshold in BOTH pops but for DIFFERENT alleles (i.e., just about fixed for opp alleles) then keep that.
+ 	+ If it's totally fixed in one but fixed for the opposite allele in the other, then definitely keep it even though the MAF of one pop is 0.  
+3.  By frequency/pecentage, across populations.  I like this method better than the by-counts way because you can make MAF = some threshold regardless of how many individuals are genotyped, but I don't have a strong opinion about it.
+4.  By frequency/percentage, within populations: `vcf_extract_by_MAF_percentage.pl`.  This is how I did it first.  However, at this point, I can't remember why I thought within-pop MAF had any advantage over across-pop MAF.  At best, it's probably going to give you the same results as across-pop calculations, but with more room for screwing up the script.  For example, you may have 90 'A' alleles and 10 'a' alleles across 2 pops.  If your MAF cutoff is 0.06, you would keep that locus if you look across pops (10/100 = 0.1, > 0.06).  But if you look within pops, the 'A' allele could be distributed equally (MAF pop1 = 0.1, MAF pop2 = 0.1).  But, maybe all 'a' alleles are in one pop (MAF pop1 = 0, MAF pop2 = 0.2).   I would still keep that site.  Is there a situation where the 'a' allele could be distributed unequally such that I would discard that site when looking within-pops instead of across-pops?  As long as one pop is above threshold, then I tend to keep that locus.  Maybe there are some cases where different numbers of individuals/contributed alleles would affect the cutoff such that the distribution of minor alleles is below threshold in both pops but above overall but I can't even come up with an illustration of this at the moment.  Whatever, I already did the work, and here was my logic behind it:
 
-Imagine that pop1 has the following allelic composition: {0, 0, 0, 0}.  The frequency of allele 0 is 1; the freq of allele 1 is 0.  MAF gets calculated as 1.
+example if threshold = 0.1
+
+pop1 allele A | pop2 allele A | MAF pop1 | MAF pop2 | notes
+| ---- | ---- | ---- | ----- | ----- |
+    95%       |      97%      |   0.05   |   0.03   | Exclude; too low in both pops
+    95%       |       3%      |   0.05   |   0.03   | Include; low MAF but different alleles, i.e. nearly-private alleles
+    80%       |      98%      |   0.20   |   0.02   | Include; low MAF but only in a single pop
+   100%       |     100%      |   1.00   |   1.00   | Exclude; monomorphic
+   100%       |       0%      |   1.00   |   0.00   | Include; fixed for different alleles
+
+
+> I scripted `vcf_extract_by_MAF_percentage.pl` to calculate MAF within pops instead of across them.  This flexibility means that it's possible for the minor alleles to be different between pop1 and pop2; for example, pop1 may be homozygous reference (allele 0, frequency = 1) while pop2 is nearly-but-not-quite homozygous for the alternate allele (allele 0, frequency = 0.05).  This is actually the kind of signal we're looking for and we'd be remiss to throw it out.  However, a word of caution about coding this type of thing:  
+
+> My script calculates MAF by counting the number of times each allele is seen **within** a pop, finding which allele is rarer, then dividing that rare allele's count by twice the number of individuals with genotyped data at that SNP.  So, if you're a homozygote, there is only one allele seen in the data, which is then considered the 'rare' allele, resulting in the MAF being calculated as 1 and not as 0.  If pop2 is het and the rare allele is the SAME as the homozyg allele in pop1, then everything is fine.  However, if pop2 is het and the rare allele is DIFFERENT than the homozyg allele in pop1, then the true MAF of pop1 is 0 and not 1.
+
+> Imagine that pop1 has the following allelic composition: {0, 0, 0, 0}.  The frequency of allele 0 is 1; the freq of allele 1 is 0.  MAF gets calculated as 1.
 Now imagine that pop2 looks like this: {0, 0, 0, 1}.  Freq{0} = 0.75, freq{1} = 0.25.  MAF gets calculated as 0.25.
 It would be erroneous to compare pop1's MAF=1 to pop2's MAF=0.25.  The MAF of pop1, relative to the MAF of pop2, is actually 0.  
 
-The workaround is actually pretty simple: for every pop1 or pop2 MAF = 1, double check to see if the identified rare alleles are the same between pops.  If they are NOT the same alleles, change pop1 MAF to 0.  If they ARE the same alleles, then everything is cool and you can indeed compare MAFs between the pops.  
-
-This is how I scripted the rest of the MAF requirements in `vcf_extract_by_MAF.pl` v. 2Oct2013, just for documentation:
-+  `$low_p1` or `$low_p2` refer to the minor allele state (as in, "0" = reference or "1" = alternate, or even "7" if there are that many alleles) in each pop
-+  `$minor_1` or `$minor_2` refer to the actual MAF within each population
-+  `$p1_allele` or `$p2_allele` refer to the number of alleles seen total; as in, "1" allele for a monomorphic pop, "2" for a het pop, or "7" for a hyper-variable pop, etc
-
-If the rare alleles are different between pops AND the MAF = 1 in either pop, reset MAF to equal 0 instead:
-+  `if (($low_p1 != $low_p2) && ($minor_1 == 1)) {$minor_1 = 0;}`  # if $low_p1 = 0, $low_p2 = 1, pop1 MAF = 1, reset MAf = 0
-+  `if (($low_p1 != $low_p2) && ($minor_2 == 1)) {$minor_2 = 0;}`
-
-
-If the rare alleles are the SAME between pops AND only a single allele is seen in both pops (i.e., both pops are monomorphic for the same allele), make a note of this and move on; DON'T consider or print out these SNPs
-+  `if (($low_p1 == $low_p2) && ($p1_allele==1) && ($p2_allele==1)) {$monomorph++;next;}`
-
-If the rare alleles are the SAME between pops AND the MAF is below the threshold in BOTH pops, count and skip.  It's okay if a single pop has low MAF but the other doesn't.  It is also okay if MAF is too low in BOTH pops as long as it is for different SNPs.  Remember, as per the discussion above, if the MAF in one pop is calculated as 1, the rare allele states are compared and if the pops' MAFs were calculated relative to different alleles, MAF=1 is reset to MAF=0 and will therefore usually be below any threshold.  (note for clarity: my script uses the syntax 'less than' whatever threshold, not 'less than or equal to' so if you supply the threshold as 0 these MAF=0 guys will not get discarded)
-+  `if (($minor_1<$threshold) && ($minor_2<$threshold)) {$low_maf++;next;}`
-
-If the rare alleles are different between pops AND only a single allele is seen in both pops (i.e., each pop is totally fixed for different alleles), make a note of how many times this happens, the positions of where that occurs, and keep going (don't skip these SNPs):
-+  `if (($low_p1 != $low_p2) && ($p1_allele==1) && ($p2_allele==1)) {$counter++;$fixed{$chrom}{$pos}++;}`
-
-this is just for fun; checks to see how many times you see alleles that are almost fixed in each pop but for different alleles
-+  `if (($low_p1 != $low_p2) && ($minor_1<$threshold) && ($minor_2<$threshold)) {$almost_fixed++;}`
-
-this is also just for fun; checks to see how many times the minor allele is below the threshold in ONE pop but NOT in the other; i.e., MAF pop1 = 0.2, MAF pop2 = 0.03; you want to keep these guys
-+  `if (($low_p1 == $low_p2) && (($minor_1<$threshold)|($minor_2<$threshold))) {$one_below++;}`
     
 
 
@@ -198,18 +195,16 @@ this is also just for fun; checks to see how many times the minor allele is belo
 
 
 Test this shit out:
-#### BayeScan - Testing for MAF effects.  Run BayeScan on 30k randomly sampled SNPs from KxO population comparison using different MAF cutoffs: 
-1.  All SNPs equally likely to be selected as part of the 30k (no MAF filtering at all)
-2.  Exclude singleton SNPs only (as in, if an allele is only present once in EITHER population/a single alternate-allele-having heterozygote exists in any one pop)
-3.  Exclude SNPs that are only seen twice (as in, a single diploid alt-allele-having homozygote across populations
-4.  Require SNPs to have MAF gt 0.1 in at least one pop
-5.  Require SNPs to have MAF gt 0.25 in BOTH pops
+#### BayeScan - Testing for MAF effects.  Run BayeScan on SNPs from KxO population comparison (59 individuals = 118 alleles) using different MAF cutoffs: 
+2.  Exclude singleton SNPs only (as in, if an allele is only present once in EITHER population/a single alternate-allele-having heterozygote exists in any one pop) (MAF ~= 0.01)
+3.  Exclude SNPs that are seen 3 or fewer times (MAF ~= 0.025)
+4.  Require SNPs to have MAF gt 0.1 in at least one pop (see each allele 12 or more times across both pops)
+5.  Require SNPs to have MAF gt 0.25 in BOTH pops (see each allele 31 times or more across both pops)
 
 
 
 1.  Extract pairwise pops based on MAF cutoffs.  
-	* `vcf_extract_pops_by_MAF.pl` v. 2 Oct 2013 R. Capper to extract pairwise populations and delete loci based on MAF percentage threshold.
-	* ` ` v. 2 Oct 2013 R. Capper to extract pairwise populations and delete loci based on number of times an allele is encountered (remove singleton alleles, alleles seen only twice, etc)
+	* `vcf_extract_pops_by_MAF_count.pl` v. 7 Oct 2013 R. Capper to extract pairwise populations and delete loci based on MAF percentage threshold.  Note:  This script is simplistic in that it only requires an allele to be seen X times, as opposed to a script that accounts for different numbers of genotyped individuals per SNP (such as a percent-based method, i.e., "MAF gt 0.01" vs "rare allele seen more than once".  Additionally, there are different ways you could calculate MAF: 1) across both pops (the 
 3.  vcf -> genepop
 4.  genepop -> bayescan
 5.  run bayescan
