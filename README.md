@@ -195,19 +195,23 @@ It would be erroneous to compare pop1's MAF=1 to pop2's MAF=0.25.  The MAF of po
 
 
 Test this shit out:
-#### BayeScan - Testing for MAF effects.  Run BayeScan on SNPs from KxO population comparison (59 individuals = 118 alleles) using different MAF cutoffs: 
-2.  Exclude singleton SNPs only (as in, if an allele is only present once in EITHER population/a single alternate-allele-having heterozygote exists in any one pop) (MAF ~= 0.01)
+#### BayeScan - Testing for MAF effects.  Run BayeScan on SNPs from KxO population comparison (59 individuals = 118 alleles) using different MAF cutoffs (`vcf_extract_by_MAF_counts.pl`).  Question:  How does varying MAF cutoff affect Fst distribution?  
+
+1.  All non-monomorphic SNPs (51910 SNPs)
+1.  Exclude singleton SNPs only (as in, if an allele is only present once in EITHER population/a single alternate-allele-having heterozygote exists in any one pop) (MAF ~= 0.01)
 3.  Exclude SNPs that are seen 3 or fewer times (MAF ~= 0.025)
 4.  Require SNPs to have MAF gt 0.1 in at least one pop (see each allele 12 or more times across both pops)
 5.  Require SNPs to have MAF gt 0.25 in BOTH pops (see each allele 31 times or more across both pops)
+---------
+1.  vcf -> genepop: `vcf2genepop.pl vcf="KxO.maf_gt_0.01.vcf" pops=K,O > KxO.0.01.genepop`
+4.  genepop -> bayescan: `java -jar /work/01408/rlc2489/RoxyTools/PGDSpider_2.0.4.0/PGDSpider2-cli.jar -inputfile AxK.genepop -inputformat GENEPOP -outputfile AxK.bayescan -outputformat GEST_BAYE_SCAN -spid genepop2bayescan.spid`
+5.  run bayescan with threads option: `bayescan_2.1 KxO.0.01.bayescan -threads 24`
+
+#### vcftools weir and cockerham Fst:  How does varying MAF cutoff affect Fst distribution/profiles?
 
 
 
-1.  Extract pairwise pops based on MAF cutoffs.  
-	* `vcf_extract_pops_by_MAF_count.pl` v. 7 Oct 2013 R. Capper to extract pairwise populations and delete loci based on MAF percentage threshold.  Note:  This script is simplistic in that it only requires an allele to be seen X times, as opposed to a script that accounts for different numbers of genotyped individuals per SNP (such as a percent-based method, i.e., "MAF gt 0.01" vs "rare allele seen more than once".  Additionally, there are different ways you could calculate MAF: 1) across both pops (the 
-3.  vcf -> genepop
-4.  genepop -> bayescan
-5.  run bayescan
+
 
 
 #### BayeScan - decisions, data prep, the runs, and processing
