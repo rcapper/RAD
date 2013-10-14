@@ -194,7 +194,8 @@ It would be erroneous to compare pop1's MAF=1 to pop2's MAF=0.25.  The MAF of po
 
 
 
-Test this shit out:
+Test out how MAF affects Fst using BayeScan AND vcftools fst.
+---------
 #### BayeScan - Testing for MAF effects.  Run BayeScan on SNPs from KxO population comparison (59 individuals = 118 alleles) using different MAF cutoffs (`vcf_extract_by_MAF_counts.pl`).  Question:  How does varying MAF cutoff affect Fst distribution?  
 
 1.  All non-monomorphic SNPs (51910 SNPs)
@@ -202,12 +203,33 @@ Test this shit out:
 3.  Exclude SNPs that are seen 3 or fewer times (MAF ~= 0.025)
 4.  Require SNPs to have MAF gt 0.1 in at least one pop (see each allele 12 or more times across both pops)
 5.  Require SNPs to have MAF gt 0.25 in BOTH pops (see each allele 31 times or more across both pops)
----------
+
+---
+
 1.  vcf -> genepop: `vcf2genepop.pl vcf="KxO.maf_gt_0.01.vcf" pops=K,O > KxO.0.01.genepop`
 4.  genepop -> bayescan: `java -jar /work/01408/rlc2489/RoxyTools/PGDSpider_2.0.4.0/PGDSpider2-cli.jar -inputfile AxK.genepop -inputformat GENEPOP -outputfile AxK.bayescan -outputformat GEST_BAYE_SCAN -spid genepop2bayescan.spid`
 5.  run bayescan with threads option: `bayescan_2.1 KxO.0.01.bayescan -threads 24`
 
 #### vcftools weir and cockerham Fst:  How does varying MAF cutoff affect Fst distribution/profiles?
+
+Answer:  It doesn't really.  Each locus' Fst is calculated independently from the others, so the values themselves don't change.  What does change is the NUMBER of SNPs included.  If a lot of your low-MAF SNPs are the same freq across pops (like, pop1 = 0.01, pop2 = 0.00), then there's no variation!  And therefore Fst is low!  So you're cutting out all those guys that bring the baseline down, which usually would bring the baseline up and/or resolve signals and peaks better, or at least make them higher/clearer.
+
+For example: see fig 3 in Roesti et al.  I can't figure out how to post pictures in markdown, but basically the figure is Fst vs chr position, showing that the Fst profile is much lower and has fewer peaks/lower signal when INCLUDING low-MAF SNPs, than when EXCLUDING them.  It makes sense that you might see a lower profile when including more, lower SNPs especially if you use sliding window/smoothing or whatever, as you probably should.
+
+#### vcftools weir and cockerham Fst:  How does varying MAF cutoff affect global Fst values?
+
+1.  Extract SNPs by MAF cutoff using `vcf_extract_by_MAF_counts.pl` as above, five conditions: 
+	+  no MAF filter (51910 SNPs), 
+	+  MAF gt 0.01 (40906 SNPs), 
+	+  MAF gt 0.025 (30458 SNPs), 
+	+  MAF gt 0.10 (16438 SNPs), 
+	+  MAF gt 0.25 (6500 SNPs)
+2.  run vcftools `vcftools --vcf KxO.all_maf.vcf --weir-fst-pop K.pop --weir-fst-pop O.pop`
+3.  output = weighted Fst; Graph Fst vs. MAF; Graph Fst vs. number of SNPs
+	+  however, this may very well be confounded by number of SNPs!  So, to disentangle this (just for fun), extract 50k, 41k, 30k, 16k and 6.5k SNPs randomly without regard to MAF from the KxO non-monomorphic SNP set, run vcftools again, graph.
+4.  Extract random SNPs:
+
+
 
 
 
@@ -221,6 +243,13 @@ Two steps:
 2.  Apply MAF > 0.05 filtering to all pairwise pop vcfs, AND to all_five_pops.vcf 
 
 How many SNPs result per file?  Can BayeScan actually run on that number of SNPs?  Seems like BayeScan really can only handle ~30k SNPs per run.  If you have more than 30k SNPs, I suggest splitting them into pieces and running BayeScan independently on each set of SNPs, then combining later.
+
+
+
+Fst Plotting:
+---
++  Local polynomial fitting?
++  sliding windows?
 
 ```
 
