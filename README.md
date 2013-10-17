@@ -207,7 +207,7 @@ Test out how MAF affects Fst using BayeScan AND vcftools fst.
 ---
 
 1.  vcf -> genepop: `vcf2genepop.pl vcf="KxO.maf_gt_0.01.vcf" pops=K,O > KxO.0.01.genepop`
-4.  genepop -> bayescan: `java -jar /work/01408/rlc2489/RoxyTools/PGDSpider_2.0.4.0/PGDSpider2-cli.jar -inputfile AxK.genepop -inputformat GENEPOP -outputfile AxK.bayescan -outputformat GEST_BAYE_SCAN -spid genepop2bayescan.spid`
+4.  genepop -> bayescan: `java -jar /work/01408/rlc2489/RoxyTools/PGDSpider_2.0.4.0/PGDSpider2-cli.jar\` `-inputfile AxK.genepop -inputformat GENEPOP -outputfile AxK.bayescan\` `-outputformat GEST_BAYE_SCAN -spid genepop2bayescan.spid`
 5.  run bayescan with threads option: `bayescan_2.1 KxO.0.01.bayescan -threads 24`
 
 #### vcftools weir and cockerham Fst:  How does varying MAF cutoff affect Fst distribution/profiles?
