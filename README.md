@@ -258,8 +258,9 @@ Fst Plotting:
 
 ## Pi
 ---
-Can you actually calculate pi from RAD data?  Likely not: we are NOT looking at every variant site in the genome, only a subsample.  Unless you had a breakdown of known invariant/variant sites then this won't work; i.e., you'd need to the lengths of each tag and where the SNPs are within those tags, not simply a pretty .vcf file.
+Can you actually calculate pi from RAD data?  We are NOT looking at every variant site in the genome, only a subsample.  Unless you had a breakdown of known invariant/variant sites then this won't work; i.e., you'd need to the lengths of each tag and where the SNPs are within those tags, not simply a pretty .vcf file.
 
+However, if you get GATK to output a list of EVERY gENOTYPED BASE including invariants, then yes, you CAN calculate pi.  See my script vcf2pi.pl.
 
 ## Linkage Disequilibrium
 ---
@@ -268,6 +269,11 @@ See Association Mapping of Kernel Size and Milling Quality in Wheat (Triticum ae
 Basically, you can either draw an arbitrary cutoff value at r^2 = 0.1, or you can mark the 95th percentile of the distribution of unlinked loci and intersect that line with the loess regression.
 
 Also see : http://fabiomarroni.wordpress.com/2011/08/09/estimate-decay-of-linkage-disequilibrium-with-distance/
+
+Also see: "fig3: Plots of linkage disequilibrium (LD) values (r2) against genetic distance (cM) between pairs of markers in multiple classes of cultivated tomato. All possible pair-wise combinations of markers on the same chromosome were plotted to visualize LD decay within chromosomes over the entire genome. The r2 values were calculated separately for processing and fresh market cultivars (B and C, respectively) as well as processing, fresh market, and vintage cultivar classes combined (A). Curves were fit for each plot by second-degree LOESS. The horizontal dotted lines indicate the baseline r2 values based on the 95th percentile of the distribution of unlinked r2 values (black) and the fixed r2 value of 0.1 (grey).
+
+Mentions: The decay of LD over genetic distance was investigated by plotting pair-wise r2 values against the distance (cM) between markers on the same chromosome (Fig. 3). A smooth line was fit to the data using second-degree locally weighted scatterplot smoothing (LOESS; Breseghello and Sorrells, 2006) as implemented in SAS. To describe the relationship between LD decay and genetic distance, two methods of establishing baseline r2 values were investigated. Critical values of r2 were based on a fixed value of 0.1 (Nordborg et al., 2002; Palaisa et al., 2003; Remington et al., 2001) and from the parametric 95th percentile of the distribution of the unlinked markers (Breseghello and Sorrells, 2006). The relationship between these baseline r2 values and genetic distance was determined using the LOESS curve and a 1 cM moving means approach. For the LOESS estimation of LD decay, genetic distance was estimated as the point where the LOESS curve first crosses the baseline r2 value. For the moving means approach, the distance between linked markers was used to divide marker pairs into bins of 1 cM. Markers separated by 0–0.9 cM were placed in the first bin, marker distances from 1–1.9 were in the second bin, etc. The mean of the r2 values within each bin was calculated and LD decay was estimated as the first bin where the baseline r2 value was lower than the bin mean."  from : http://openi.nlm.nih.gov/detailedresult.php?img=3060673_jexboterq367f03_ht&req=4
+
 
 ## Tajima's D
 ---
