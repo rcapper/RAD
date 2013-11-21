@@ -114,7 +114,9 @@ So, indeed, no easy answer, but because our approach is to simply identify "inte
 
 So, here, it seems appropriate to remove MAF < 0.05, at least for BayeScan Fst calcs
 
----  **MAF in general:**  Definition and considerations
+---  **MAF in general:**  False positives, definition and considerations
+
+_Effect on false positives:_  See: http://www.nature.com.ezproxy.lib.utexas.edu/nrg/journal/v6/n2/pdf/nrg1521.pdf, "GENOME-WIDE ASSOCIATION STUDIES FOR COMMON DISEASES AND COMPLEX TRAITS"; Box 4.
 
 _Definition:_ MAF can either be considered as the frequency of the real minor allele, or simply as the frequency of the ALTERNATIVE/non-reference allele.  I think the latter definition is commonly used, but the alt allele is defined simply through comparison to a genome, which is usually derived from a single individual.  That's biologically and statistically meaningless, if a conventional definition.  The informative/uninformative SNP label I'm trying to apply to my data set is relevant to the actual freq instead, not some arbitrary 'ref'/'alt' status.
 
