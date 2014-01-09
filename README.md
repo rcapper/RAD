@@ -6,6 +6,8 @@ Type II B RAD uses special restriction enzymes to excise 36b DNA "tags" distribu
 
 Here, we used the enzyme BcgI, which recognizes the site ...∇(N10)CGA(N6)TGC(N12)∇..., to digest the genome of the scleractinian coral *Acropora millepora*.  
 
+Note: BcgI is methylation-**sensitive**; we're not sure what kind of bias, if any, this introduces, but it is definitely something to consider.
+
 
 ## Trimming Raw Reads
 ---
